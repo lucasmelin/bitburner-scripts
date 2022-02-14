@@ -62,11 +62,14 @@ export async function main(ns) {
         ns.getServerMaxRam(server) - ns.getServerUsedRam(server) >= stagingRam
     );
 
-    const prep = stagingServer ? 0 : 1;
+    const prep = stagingServer == null ? 0 : 1;
     ns.print(`Staging: ${stagingServer} ${prep}`);
 
     if (prep) {
       if (growthRate > 1) {
+        await ns.scp("growTarget.js", stagingServer);
+        await ns.scp("hackTarget.js", stagingServer);
+        await ns.scp("weakenTarget.js", stagingServer);
         ns.exec(
           "growTarget.js",
           stagingServer,

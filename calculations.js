@@ -3,7 +3,7 @@
 import { gainRootAccess } from "gainRoot.js";
 
 export function calculateMostProfitableTarget(ns, targets) {
-  const candidates = targets
+  targets
     .filter((server) => {
       if (server == "home") {
         // Skip home server.
@@ -19,12 +19,24 @@ export function calculateMostProfitableTarget(ns, targets) {
       if (!ns.hasRootAccess(server)) {
         gainRootAccess(ns, server);
       }
+    });
+  const candidates = targets
+    .filter((server) => {
+      if (server == "home") {
+        // Skip home server.
+        return false;
+      }
+      if (ns.getPurchasedServers().includes(server)) {
+        // Skip purchased servers.
+        return false;
+      }
+      return true;
     })
     .filter((server) => {
-      ns.hasRootAccess(server);
+      return ns.hasRootAccess(server);
     })
     .filter((server) => {
-      ns.getServerRequiredHackingLevel(server) <= ns.getHackingLevel();
+      return ns.getServerRequiredHackingLevel(server) <= ns.getHackingLevel();
     });
 
   const serverMoneyMaxes = candidates.map((target) =>
